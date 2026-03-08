@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Career Recommendations</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #e4ecf5;
+            margin: 0;
+        }
+        
+        .container {
+            width: 700px;
+            margin: 40px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+        }
+        
+        h2 {
+            text-align: center;
+            color: #2c66b2;
+        }
+        
+        .card {
+            background: #eef4fb;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 6px;
+        }
+        
+        button {
+            margin-top: 15px;
+            padding: 12px;
+            width: 100%;
+            background: #2c66b2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #1d4f8a;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Your Career Recommendations</h2>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const userId = localStorage.getItem("userId");
+
+        if (!userId) {
+            document.getElementById("result").innerHTML = "<p>No user data found. Please complete the assessment first.</p>";
+        } else {
+            fetch(`/get-careers?user_id=${userId}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to fetch career recommendations");
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById("result").innerHTML = `<p>${data.error}</p>`;
+                        return;
+                    }
+                    displayCareers(data);
+                })
+                .catch(err => {
+                    console.error("Failed to fetch careers:", err);
+                    document.getElementById("result").innerHTML =
+                        "<p>Unable to load career recommendations. Make sure your Flask backend is running.</p>";
+                });
+        }
+
+        function displayCareers(data) {
+            const result = document.getElementById("result");
+            let output = "";
+
+            const interest = data.interest || "";
+            const weak = data.weakSubject || "";
+            const skills = data.skills || [];
+            const personality = data.personality || "";
+
+            data.careers.forEach(c => {
+                const reason = `This career is suitable for you because your interest is ${interest}, your personality type is ${personality}, and your selected skills (${skills.join(", ")}) match the requirements of this field.`;
+
+                output += `
+<div class="card">
+    <h3>${c.name}</h3>
+    <p><b>Why it is suitable for you:</b> ${reason}</p>
+    <p><b>Courses to Learn:</b> ${c.courses.join(", ")}</p>
+    <p><b>Skills Required:</b> ${c.skills.join(", ")}</p>
+    <p><b>Your Weak Area:</b> ${weak}</p>
+    <p><b>How to Improve:</b> ${c.improve}</p>
+    <p><b>Learning Platforms:</b> ${c.platforms.join(", ")}</p>
+    <button onclick="goToRoadmap('${c.name}')">View Career Roadmap</button>
+</div>
+`;
+            });
+
+            result.innerHTML = output;
+        }
+
+        function goToRoadmap(careerName) {
+            localStorage.setItem("selectedCareer", careerName);
+            window.location.href = "career-roadmap.html";
+        }
+    </script>
+</body>
+
+</html>
