@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Career Assessment</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #e6edf5;
+            margin: 0;
+        }
+        
+        .container {
+            width: 500px;
+            max-width: 90%;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            text-align: center;
+            color: #1e63b6;
+            margin-bottom: 25px;
+        }
+        
+        label {
+            font-weight: 600;
+            display: block;
+            margin-top: 15px;
+        }
+        
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 15px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        
+        .checkbox-group label {
+            font-weight: normal;
+            display: block;
+            margin: 5px 0;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #1e63b6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            background: #164c8c;
+        }
+        
+        .tooltip {
+            font-size: 12px;
+            color: #555;
+        }
+    </style>
+
+    <script>
+        function showTechOptions() {
+            const interest = document.getElementById("interest").value;
+            const techDiv = document.getElementById("techOptions");
+            techDiv.style.display = interest === "Technology" ? "block" : "none";
+        }
+
+        function updateWeakSubjects() {
+            const qualification = document.getElementById("qualification").value;
+            const interest = document.getElementById("interest").value;
+            const weakSubject = document.getElementById("weakSubject");
+            weakSubject.innerHTML = "";
+
+            let subjects = [];
+            if (interest === "Technology") {
+                if (qualification === "10th") subjects = ["Mathematics", "English", "Science"];
+                else if (qualification === "12th") subjects = ["Mathematics", "Physics", "Chemistry", "Biology", "English"];
+                else if (qualification === "Diploma") subjects = ["Mathematics", "Programming", "Electronics"];
+                else if (qualification === "UG") subjects = ["Mathematics", "Programming", "Statistics"];
+                else if (qualification === "PG") subjects = ["Research", "Programming", "Statistics"];
+            } else if (interest === "Design") {
+                subjects = ["Creativity", "Design Tools", "Visualization"];
+            } else if (interest === "Business") {
+                subjects = ["Business Knowledge", "Marketing", "Communication"];
+            } else {
+                subjects = ["General Knowledge", "Communication"];
+            }
+
+            subjects.forEach(sub => {
+                const option = document.createElement("option");
+                option.text = sub;
+                option.value = sub;
+                weakSubject.appendChild(option);
+            });
+        }
+
+        function validateForm() {
+            const qualification = document.getElementById("qualification").value;
+            const interest = document.getElementById("interest").value;
+            if (!qualification) {
+                alert("Please select your qualification");
+                return false;
+            }
+            if (!interest || interest === "Select Interest") {
+                alert("Please select your interest");
+                return false;
+            }
+            if (interest === "Technology") {
+                const techField = document.getElementById("techField").value;
+                if (!techField) {
+                    alert("Please select technology field");
+                    return false;
+                }
+            }
+            if (qualification !== "10th") {
+                const weakSubject = document.getElementById("weakSubject").value;
+                if (!weakSubject) {
+                    alert("Please select weak subject");
+                    return false;
+                }
+            }
+            const skills = document.querySelectorAll('input[name="skills"]:checked');
+            if (skills.length === 0) {
+                alert("Please select at least one skill");
+                return false;
+            }
+            const personality = document.querySelector('input[name="personality"]:checked');
+            if (!personality) {
+                alert("Please select personality type");
+                return false;
+            }
+            const goal = document.getElementById("goal").value;
+            if (!goal || goal === "Select Goal") {
+                alert("Please select career goal");
+                return false;
+            }
+            return true;
+        }
+
+        function showResult() {
+            if (!validateForm()) return;
+
+            const answers = {
+                qualification: document.getElementById("qualification").value,
+                interest: document.getElementById("interest").value,
+                techField: document.getElementById("techField").value,
+                weakSubject: document.getElementById("weakSubject").value,
+                skills: Array.from(document.querySelectorAll('input[name="skills"]:checked')).map(el => el.value),
+                personality: document.querySelector('input[name="personality"]:checked').value,
+                goal: document.getElementById("goal").value
+            };
+
+            // POST to Flask backend
+            fetch('/save-assessment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(answers)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    localStorage.setItem('userId', data.userId); // save userId
+                    // Redirect to Flask route, not a file
+                    window.location.href = "career-result.html";
+                })
+                .catch(err => {
+                    console.error("Error:", err);
+                    alert("Failed to save assessment. Make sure your Flask backend is running.");
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Career Assessment</h2>
+
+        <form onsubmit="event.preventDefault(); showResult();">
+            <label>Highest Qualification</label>
+            <select id="qualification" onchange="updateWeakSubjects()">
+                <option value="">Select Qualification</option>
+                <option>10th</option>
+                <option>12th</option>
+                <option>Diploma</option>
+                <option>UG</option>
+                <option>PG</option>
+            </select>
+
+            <label>Interest</label>
+            <select id="interest" onchange="showTechOptions(); updateWeakSubjects()">
+                <option>Select Interest</option>
+                <option>Technology</option>
+                <option>Business</option>
+                <option>Design</option>
+                <option>Healthcare</option>
+                <option>Education</option>
+            </select>
+
+            <div id="techOptions" style="display:none;">
+                <label>Technology Field</label>
+                <select id="techField">
+                    <option value="">Select Tech Field</option>
+                    <option>Web Development</option>
+                    <option>App Development</option>
+                    <option>Artificial Intelligence</option>
+                    <option>Cyber Security</option>
+                    <option>Data Science</option>
+                </select>
+            </div>
+
+            <label>Weak Subject</label>
+            <select id="weakSubject">
+                <option value="">Select Weak Subject</option>
+            </select>
+
+            <label>Skills <span class="tooltip">(Select all that apply)</span></label>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="skills" value="Coding"> Coding</label>
+                <label><input type="checkbox" name="skills" value="Creativity"> Creativity</label>
+                <label><input type="checkbox" name="skills" value="Analytical Thinking"> Analytical Thinking</label>
+                <label><input type="checkbox" name="skills" value="Communication"> Communication</label>
+                <label><input type="checkbox" name="skills" value="Problem Solving"> Problem Solving</label>
+            </div>
+
+            <label>Personality Type</label>
+            <div class="checkbox-group">
+                <label><input type="radio" name="personality" value="Logical"> Logical</label>
+                <label><input type="radio" name="personality" value="Creative"> Creative</label>
+                <label><input type="radio" name="personality" value="Social"> Social</label>
+                <label><input type="radio" name="personality" value="Detail-oriented"> Detail-oriented</label>
+            </div>
+
+            <label>Career Goal</label>
+            <select id="goal">
+                <option>Select Goal</option>
+                <option>High Income</option>
+                <option>Helping People</option>
+                <option>Innovation</option>
+                <option>Creativity</option>
+                <option>Flexible Work</option>
+            </select>
+
+            <button type="submit">See Results</button>
+        </form>
+    </div>
+</body>
+
+</html>
