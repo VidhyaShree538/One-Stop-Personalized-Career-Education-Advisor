@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Career & Education Advisor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            height: 100vh;
+            background: linear-gradient(135deg, #e3f2fd, #f1f8ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 900px;
+            max-width: 95%;
+            display: flex;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        /* Left panel */
+        
+        .left-panel {
+            background: linear-gradient(135deg, #1565c0, #42a5f5);
+            color: white;
+            padding: 40px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .left-panel h1 {
+            font-size: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .left-panel p {
+            font-size: 15px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        /* Right panel */
+        
+        .right-panel {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .login-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1565c0;
+        }
+        
+        .login-subtitle {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            font-size: 14px;
+            color: #333;
+            display: block;
+            margin-bottom: 6px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        
+        .input-group input:focus {
+            border-color: #1565c0;
+            outline: none;
+            box-shadow: 0 0 5px rgba(21, 101, 192, 0.2);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #1565c0;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .login-btn:hover {
+            background: #0d47a1;
+        }
+        
+        .footer-text {
+            text-align: center;
+            font-size: 13px;
+            margin-top: 20px;
+            color: #888;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .left-panel {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="left-panel">
+            <h1>One-Stop Career & Education Advisor</h1>
+            <p>
+                Discover the right career path, explore educational opportunities, and receive personalized guidance tailored to your goals.
+            </p>
+        </div>
+
+        <div class="right-panel">
+            <div class="login-title">Welcome Back</div>
+            <div class="login-subtitle">Enter your details to continue</div>
+
+            <form onsubmit="goToAssessment(event)">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" placeholder="Enter your name" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="Enter your email" required>
+                </div>
+
+                <button type="submit" class="login-btn">Get Started</button>
+            </form>
+
+            <div class="footer-text">
+                Empowering students for a brighter future 🎓
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function goToAssessment(event) {
+            event.preventDefault();
+
+            const name = document.querySelector('input[type="text"]').value;
+            const email = document.querySelector('input[type="email"]').value;
+
+            if (!name || !email) {
+                alert("Please enter both name and email");
+                return;
+            }
+
+            const userId = Date.now(); // temporary user ID
+            localStorage.setItem('userId', userId);
+            localStorage.setItem('userName', name);
+            localStorage.setItem('userEmail', email);
+
+            // Redirect using Flask route
+            window.location.href = "/assessment"; // <-- IMPORTANT
+        }
+    </script>
+
+</body>
+
+</html>
